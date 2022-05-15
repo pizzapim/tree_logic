@@ -1,0 +1,44 @@
+/*
+  Model for the Double Tree Puzzles by Katie_Wandering on Sporcle.
+  Can be trivially altered to support n trees.
+  To my knowledge IDP doesn't support parameterized existential quantifiers so I could not generalise it.
+  
+  See also:
+  https://www.sporcle.com/playlists/SporcleEXP/double-trees-logic-puzzles
+  https://www.sporcle.com/blog/tips-for-double-trees-puzzles/
+*/
+
+vocabulary TreesV {
+    type X isa nat
+    type Y isa nat
+    type Colour
+    
+    TileColour(X, Y) : Colour
+    TileTree(X, Y)
+}
+
+theory TreesT : TreesV {
+    // A tree can only exist on a coloured tile.
+    ! x[X] y[Y]: TileTree(x, y) => ? c[Colour]: TileColour(x, y) = c.
+    // Two trees in every row.
+    ! x[X]: ?=2 y[Y]: TileTree(x, y).
+    // Two trees in every column.
+    ! y[Y]: ?=2 x[X]: TileTree(x, y).
+    // Two trees for every colour.
+    ! c[Colour]: ?=2 x[X] y[Y]: TileColour(x, y) = c & TileTree(x, y).
+    // No trees can touch eachother.
+    ! x[X] y[Y]: TileTree(x, y) => ~TileTree(x-1, y) &
+                                   ~TileTree(x+1, y) &
+                                   ~TileTree(x, y-1) &
+                                   ~TileTree(x, y+1) &
+                                   ~TileTree(x-1, y-1) &
+                                   ~TileTree(x-1, y+1) &
+                                   ~TileTree(x+1, y-1) &
+                                   ~TileTree(x+1, y+1).
+}
+
+procedure main() {
+    print(onemodel(TreesT, ExampleS))
+}
+
+include "example_structure.idp"
